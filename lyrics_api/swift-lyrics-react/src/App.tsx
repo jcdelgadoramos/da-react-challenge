@@ -8,27 +8,11 @@ import { Lyric } from './types';
 
 
 function App() {
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [result, setResult] = useState<Lyric[]>([]);
   const [querySize, setQuerySize] = useState(25);
   const [queryText, setQueryText] = useState("");
-
-
-  async function getLyrics() {
-    try {
-      const { data } = await api.get(
-        `/lyric/?size=${querySize}&search=${queryText}`);
-      if (data === undefined) {
-        setError(true);
-        throw(new Error('Invalid response'));
-      }
-      setResult(data.results);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const changeQuerySize = (event:any) => {
     setQuerySize(event.target.value);
@@ -39,6 +23,19 @@ function App() {
   }
 
   useEffect(() => {
+    const getLyrics = async () => {
+      try {
+        const { data } = await api.get(
+          `/lyric/?size=${querySize}&search=${queryText}`);
+        if (data === undefined) {
+          setError(true);
+          throw(new Error('Invalid response'));
+        }
+        setResult(data.results);
+      } finally {
+        setLoading(false);
+      }
+    };
     getLyrics();
   }, [querySize, queryText]);
 
