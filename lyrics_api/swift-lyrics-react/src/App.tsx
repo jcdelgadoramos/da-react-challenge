@@ -13,11 +13,13 @@ function App() {
   const [error, setError] = useState(false);
   const [result, setResult] = useState<Lyric[]>([]);
   const [querySize, setQuerySize] = useState(25);
+  const [queryText, setQueryText] = useState("");
 
 
   async function getLyrics() {
     try {
-      const { data } = await api.get(`/lyric/?size=${querySize}`);
+      const { data } = await api.get(
+        `/lyric/?size=${querySize}&search=${queryText}`);
       if (data === undefined) {
         setError(true);
         throw(new Error('Invalid response'));
@@ -32,9 +34,13 @@ function App() {
     setQuerySize(event.target.value);
   };
 
+  const changeQueryText = (event:any) => {
+    setQueryText(event.target.value);
+  }
+
   useEffect(() => {
     getLyrics();
-  }, [querySize]);
+  }, [querySize, queryText]);
 
   if (loading) {
     return (
@@ -72,6 +78,11 @@ function App() {
             <option value="25">25</option>
             <option value="50">50</option>
           </select>
+          <input type="text"
+            name="search"
+            placeholder="Search by song name, album name and lyric text"
+            value={queryText} onChange={changeQueryText}
+          />
           <Table dark>
             <thead>
               <tr>
