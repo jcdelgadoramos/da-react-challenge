@@ -42,6 +42,10 @@
   cursor: pointer;
 }
 
+.pointer:hover {
+  background-color: #202933;
+}
+
 .header {
   background-color: #454d55;
 }

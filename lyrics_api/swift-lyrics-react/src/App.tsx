@@ -17,6 +17,7 @@ function App() {
   const [songSorting, setSongSorting] = useState(false);
   const [lyricSorting, setLyricSorting] = useState(false);
   const [sorting, setSorting] = useState('');
+  const [reload, setReload] = useState(false);
 
   const changeQuerySize = (event:any) => {
     setQuerySize(event.target.value);
@@ -47,6 +48,10 @@ function App() {
     setSorting(`&ordering=${lyricSorting ? '' : '-'}text`)
   }
 
+  const requestReload = () => {
+    setReload(true);
+  }
+
   useEffect(() => {
     const getLyrics = async () => {
       try {
@@ -59,10 +64,11 @@ function App() {
         setResult(data.results);
       } finally {
         setLoading(false);
+        setReload(false);
       }
     };
     getLyrics();
-  }, [querySize, queryText, sorting]);
+  }, [querySize, queryText, sorting, reload]);
 
   if (loading) {
     return (
@@ -132,7 +138,11 @@ function App() {
             <tbody>
               {
                 result.map((lyric) => (
-                  <LyricEntry key={lyric.id} lyric={lyric}></LyricEntry>
+                  <LyricEntry
+                    key={lyric.id}
+                    lyric={lyric}
+                    reload={requestReload}
+                  ></LyricEntry>
                 ))
               }
             </tbody>
