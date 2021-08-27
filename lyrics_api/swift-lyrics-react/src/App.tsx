@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { Table } from "reactstrap";
+import { Table, Label, Input } from "reactstrap";
 import LyricEntry from "./components/LyricEntry";
+import LyricForm from "./components/LyricForm";
 import api from './utils/api';
 import { Lyric } from './types';
 
@@ -18,6 +19,9 @@ function App() {
   const [lyricSorting, setLyricSorting] = useState(false);
   const [sorting, setSorting] = useState('');
   const [reload, setReload] = useState(false);
+  const [lyricId, setLyricId] = useState(0);
+  const [openForm, setOpenForm] = useState(false);
+  const [lyricInForm, setLyricInForm] = useState<Lyric>();
 
   const changeQuerySize = (event:any) => {
     setQuerySize(event.target.value);
@@ -52,6 +56,10 @@ function App() {
     setReload(true);
   }
 
+  const modifyLyricId = (id:number) => {
+    setLyricId(id);
+  }
+
   useEffect(() => {
     const getLyrics = async () => {
       try {
@@ -69,6 +77,16 @@ function App() {
     };
     getLyrics();
   }, [querySize, queryText, sorting, reload]);
+
+  useEffect(() => {
+    const lyricToForm = result.find(lyric => lyric.id === lyricId);
+    if (lyricToForm !== undefined && lyricToForm.id > 0) {
+      setLyricInForm(lyricToForm);
+      setOpenForm(true);
+    } else {
+      setOpenForm(false);
+    }
+  }, [lyricId]);
 
   if (loading) {
     return (
@@ -93,24 +111,35 @@ function App() {
       </div>
     )
   } else {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Find your favorite!
-          </p>
-          <label htmlFor="size">Select number of results:</label>
-          <select name="size" value={querySize} onChange={changeQuerySize}>
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-          </select>
-          <input type="text"
-            name="search"
-            placeholder="Search by song name, album name and lyric text"
-            value={queryText} onChange={changeQueryText}
-          />
+      return (
+        <div className="App">
+          <header className="App-header">
+            <img src={logo} className="App-logo" alt="logo" />
+            <p>
+              Find your favorite!
+            </p>
+            <div className="Menu">
+              <Label for="size" className="label">
+                Results:
+              </Label>
+              <Input
+                type="select"
+                name="size"
+                value={querySize}
+                onChange={changeQuerySize}
+              >
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </Input>
+              <Input
+                type="text"
+                name="search"
+                placeholder="Search by song name, album name and lyric text"
+                value={queryText}
+                onChange={changeQueryText}
+              />
+          </div>
           <Table dark>
             <thead>
               <tr className="header">
@@ -142,11 +171,17 @@ function App() {
                     key={lyric.id}
                     lyric={lyric}
                     reload={requestReload}
+                    openFormWithLyricId={modifyLyricId}
                   ></LyricEntry>
                 ))
               }
             </tbody>
           </Table>
+			    <LyricForm
+            lyric={lyricInForm}
+            isOpen={openForm}
+            closeFormWithLyricId={modifyLyricId}
+          />
         </header>
       </div>
     )
