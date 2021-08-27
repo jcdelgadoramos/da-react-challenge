@@ -49,3 +49,12 @@
 .header {
   background-color: #454d55;
 }
+
+.Menu {
+  display: flex;
+  width: 80%;
+}
+
+.label {
+  align-self: flex-end;
+}
