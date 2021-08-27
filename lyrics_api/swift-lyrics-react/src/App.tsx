@@ -13,6 +13,10 @@ function App() {
   const [result, setResult] = useState<Lyric[]>([]);
   const [querySize, setQuerySize] = useState(25);
   const [queryText, setQueryText] = useState("");
+  const [albumSorting, setAlbumSorting] = useState(false);
+  const [songSorting, setSongSorting] = useState(false);
+  const [lyricSorting, setLyricSorting] = useState(false);
+  const [sorting, setSorting] = useState('');
 
   const changeQuerySize = (event:any) => {
     setQuerySize(event.target.value);
@@ -22,11 +26,32 @@ function App() {
     setQueryText(event.target.value);
   }
 
+  const toggleAlbumSorting = (event:any) => {
+    setAlbumSorting(!albumSorting);
+    setSongSorting(false);
+    setLyricSorting(false);
+    setSorting(`&ordering=${albumSorting ? '' : '-'}song__album__name`)
+  }
+
+  const toggleSongSorting = () => {
+    setSongSorting(!songSorting);
+    setAlbumSorting(false);
+    setLyricSorting(false);
+    setSorting(`&ordering=${songSorting ? '' : '-'}song__name`)
+  }
+
+  const toggleLyricSorting = () => {
+    setLyricSorting(!lyricSorting);
+    setAlbumSorting(false);
+    setSongSorting(false);
+    setSorting(`&ordering=${lyricSorting ? '' : '-'}text`)
+  }
+
   useEffect(() => {
     const getLyrics = async () => {
       try {
         const { data } = await api.get(
-          `/lyric/?size=${querySize}&search=${queryText}`);
+          `/lyric/?size=${querySize}&search=${queryText}${sorting}`);
         if (data === undefined) {
           setError(true);
           throw(new Error('Invalid response'));
@@ -37,7 +62,7 @@ function App() {
       }
     };
     getLyrics();
-  }, [querySize, queryText]);
+  }, [querySize, queryText, sorting]);
 
   if (loading) {
     return (
@@ -82,11 +107,23 @@ function App() {
           />
           <Table dark>
             <thead>
-              <tr>
+              <tr className="header">
                 <th></th>
-                <th>Lyrics</th>
-                <th>Song</th>
-                <th>Album</th>
+                <th
+                  onClick={toggleLyricSorting}
+                  className="pointer">
+                  Lyrics
+                </th>
+                <th
+                  onClick={toggleSongSorting}
+                  className="pointer">
+                  Song
+                </th>
+                <th
+                  onClick={toggleAlbumSorting}
+                  className="pointer">
+                  Album
+                </th>
                 <th>Artist</th>
                 <th></th>
                 <th></th>
