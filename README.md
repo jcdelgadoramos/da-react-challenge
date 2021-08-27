@@ -16,6 +16,9 @@ The changes from the original repository from which this was forked were written
    - Configuration
       - Configuration remains the same as the original project.
 
+   - Frontend test:
+      - The test for Frontend was also developed. Unfortunately, lyric edition and upvote/downvote implementation
+      were not completed. The rest of the project works as required.
 
 ### Requirements:
 - Prereqs
